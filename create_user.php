@@ -5,7 +5,7 @@ require_once 'classes/UserCRUD.php';
 $auth = new Auth();
 $userCRUD = new UserCRUD();
 
-// Check if user is logged in and is admin
+// Check if user is logged in
 if (!$auth->isLoggedIn()) {
     header('Location: index.php');
     exit();
@@ -13,8 +13,11 @@ if (!$auth->isLoggedIn()) {
 
 $current_user = $auth->getCurrentUser();
 
-// Only admins can create users
-if ($current_user['role'] !== 'admin') {
+// Check if user can manage users (both admin and user roles)
+$can_manage_users = ($current_user['role'] === 'admin' || $current_user['role'] === 'user');
+
+// Only users with management privileges can create users
+if (!$can_manage_users) {
     header('Location: dashboard.php');
     exit();
 }
@@ -114,6 +117,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <?php echo strtoupper(substr($current_user['full_name'], 0, 1)); ?>
                         </div>
                         <?php echo Auth::sanitizeOutput($current_user['full_name']); ?>
+                        <?php if ($current_user['role'] === 'admin'): ?>
+                            <span class="badge bg-warning ms-2">Admin</span>
+                        <?php else: ?>
+                            <span class="badge bg-info ms-2">User</span>
+                        <?php endif; ?>
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="dashboard.php">
@@ -149,6 +157,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <h4 class="mb-0">
                             <i class="fas fa-user-plus me-2"></i>Create New User
                         </h4>
+                        <p class="mb-0 mt-2">
+                            <small>You have user management privileges - you can create new users for the system.</small>
+                        </p>
                     </div>
                     <div class="card-body">
                         <?php if ($error): ?>
@@ -210,8 +221,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     </label>
                                     <select class="form-control" id="role" name="role" required>
                                         <option value="user" <?php echo ($_POST['role'] ?? '') === 'user' ? 'selected' : ''; ?>>Standard User</option>
-                                        <option value="admin" <?php echo ($_POST['role'] ?? '') === 'admin' ? 'selected' : ''; ?>>Administrator</option>
+                                        <?php if ($current_user['role'] === 'admin'): ?>
+                                            <option value="admin" <?php echo ($_POST['role'] ?? '') === 'admin' ? 'selected' : ''; ?>>Administrator</option>
+                                        <?php endif; ?>
                                     </select>
+                                    <?php if ($current_user['role'] !== 'admin'): ?>
+                                        <div class="form-text">You can only create standard users. Admin role creation requires admin privileges.</div>
+                                    <?php endif; ?>
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">

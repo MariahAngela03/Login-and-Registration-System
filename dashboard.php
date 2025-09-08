@@ -15,9 +15,6 @@ $current_user = $auth->getCurrentUser();
 $error = '';
 $success = '';
 
-// Check if user can perform admin actions (both admin and user roles)
-$can_manage_users = ($current_user['role'] === 'admin' || $current_user['role'] === 'user');
-
 // Handle logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     $auth->logout();
@@ -25,9 +22,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     exit();
 }
 
-// Handle user deletion (admin and user roles)
+// Handle user deletion (admin only)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_user') {
-    if ($can_manage_users && $auth->validateCSRFToken($_POST['csrf_token'] ?? '')) {
+    if ($current_user['role'] === 'admin' && $auth->validateCSRFToken($_POST['csrf_token'] ?? '')) {
         $user_id = intval($_POST['user_id'] ?? 0);
         $result = $userCRUD->deleteUser($user_id);
         
@@ -41,9 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Handle bulk delete (admin and user roles)
+// Handle bulk delete (admin only)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bulk_delete') {
-    if ($can_manage_users && $auth->validateCSRFToken($_POST['csrf_token'] ?? '')) {
+    if ($current_user['role'] === 'admin' && $auth->validateCSRFToken($_POST['csrf_token'] ?? '')) {
         $selected_users = $_POST['selected_users'] ?? [];
         $deleted_count = 0;
         $errors = [];
@@ -146,8 +143,6 @@ if (isset($_GET['error'])) {
                         <?php echo Auth::sanitizeOutput($current_user['full_name']); ?>
                         <?php if ($current_user['role'] === 'admin'): ?>
                             <span class="badge bg-warning ms-2">Admin</span>
-                        <?php else: ?>
-                            <span class="badge bg-info ms-2">User</span>
                         <?php endif; ?>
                     </a>
                     <ul class="dropdown-menu">
@@ -178,7 +173,7 @@ if (isset($_GET['error'])) {
                             <a href="profile.php" class="list-group-item list-group-item-action">
                                 <i class="fas fa-user me-2"></i>My Profile
                             </a>
-                            <?php if ($can_manage_users): ?>
+                            <?php if ($current_user['role'] === 'admin'): ?>
                                 <a href="create_user.php" class="list-group-item list-group-item-action">
                                     <i class="fas fa-user-plus me-2"></i>Add User
                                 </a>
@@ -256,7 +251,7 @@ if (isset($_GET['error'])) {
                         <h5 class="mb-0">
                             <i class="fas fa-users me-2"></i>User Management
                         </h5>
-                        <?php if ($can_manage_users): ?>
+                        <?php if ($current_user['role'] === 'admin'): ?>
                             <a href="create_user.php" class="btn btn-success btn-sm">
                                 <i class="fas fa-user-plus me-1"></i>Add User
                             </a>
@@ -280,7 +275,7 @@ if (isset($_GET['error'])) {
                                     <?php endif; ?>
                                 </form>
                             </div>
-                            <?php if ($can_manage_users): ?>
+                            <?php if ($current_user['role'] === 'admin'): ?>
                                 <div class="col-md-6 text-end">
                                     <button type="button" class="btn btn-outline-danger btn-sm" onclick="toggleBulkActions()">
                                         <i class="fas fa-trash me-1"></i>Bulk Actions
@@ -290,7 +285,7 @@ if (isset($_GET['error'])) {
                         </div>
 
                         <!-- Bulk Actions Panel -->
-                        <?php if ($can_manage_users): ?>
+                        <?php if ($current_user['role'] === 'admin'): ?>
                             <div class="bulk-actions" id="bulkActionsPanel">
                                 <form method="POST" id="bulkActionForm">
                                     <input type="hidden" name="action" value="bulk_delete">
@@ -322,7 +317,7 @@ if (isset($_GET['error'])) {
                             <table class="table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <?php if ($can_manage_users): ?>
+                                        <?php if ($current_user['role'] === 'admin'): ?>
                                             <th width="50">
                                                 <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
                                             </th>
@@ -339,16 +334,16 @@ if (isset($_GET['error'])) {
                                 <tbody>
                                     <?php if (empty($users)): ?>
                                         <tr>
-                                            <td colspan="<?php echo ($can_manage_users) ? '8' : '7'; ?>" class="text-center text-muted">
+                                            <td colspan="<?php echo ($current_user['role'] === 'admin') ? '8' : '7'; ?>" class="text-center text-muted">
                                                 <?php echo $search_term ? 'No users found matching your search.' : 'No users found.'; ?>
                                             </td>
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($users as $user): ?>
                                             <tr>
-                                                <?php if ($can_manage_users): ?>
+                                                <?php if ($current_user['role'] === 'admin'): ?>
                                                     <td>
-                                                        <?php if ($user['id'] != $current_user['id']): ?>
+                                                        <?php if ($user['id'] != $current_user['id'] && $user['role'] !== 'admin'): ?>
                                                             <input type="checkbox" class="user-checkbox" name="selected_users[]" value="<?php echo $user['id']; ?>" onchange="updateSelectedCount()">
                                                         <?php endif; ?>
                                                     </td>
@@ -383,14 +378,14 @@ if (isset($_GET['error'])) {
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     
-                                                    <?php if ($can_manage_users || $current_user['id'] == $user['id']): ?>
+                                                    <?php if ($current_user['role'] === 'admin' || $current_user['id'] == $user['id']): ?>
                                                         <a href="edit_user.php?id=<?php echo $user['id']; ?>" 
                                                            class="btn btn-sm btn-outline-primary" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                     <?php endif; ?>
                                                     
-                                                    <?php if ($can_manage_users && $current_user['id'] != $user['id']): ?>
+                                                    <?php if ($current_user['role'] === 'admin' && $user['role'] !== 'admin' && $current_user['id'] != $user['id']): ?>
                                                         <button type="button" class="btn btn-sm btn-outline-danger" 
                                                                 title="Delete" onclick="confirmDelete(<?php echo $user['id']; ?>, '<?php echo addslashes($user['full_name']); ?>')">
                                                             <i class="fas fa-trash"></i>

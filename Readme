@@ -4,28 +4,34 @@ This is a full-stack web application built to demonstrate a secure and efficient
 
 
 Features
-1. User Authentication
-Registration: Secure new user account creation.
-Login: Session-based authentication to verify user credentials.
-Access Control: Restricts dashboard and CRUD functionality to authenticated users only.
+🔐 Authentication & Security
+Secure user registration and login
+Password hashing with PHP's password_hash()
+Session management with timeout protection
+CSRF token protection
+XSS prevention through output sanitization
+Role-based access control (Admin/User)
 
-2. Database Interaction
-PDO (PHP Data Objects): Utilizes PDO for secure and efficient database connections.
-Prepared Statements: Prevents SQL injection attacks by separating SQL queries from user data.
+👥 User Management
+Complete CRUD operations for users
+User profiles with additional information (phone, address, bio)
+Bulk user operations (admin only)
+User search functionality
+Profile image placeholder system
 
-3. CRUD Operations
-Dashboard: A secure dashboard that serves as the central hub for data management.
-Create: Functionality to add new records.
-Read: Displays user-specific data in a clean, organized table.
-Update: Allows users to modify existing records.
-Delete: Securely removes records after a confirmation prompt.
+🎨 Modern UI/UX
+Responsive Bootstrap 5 design
+Font Awesome icons
+Interactive elements and animations
+Mobile-friendly interface
+Professional dashboard layout
 
-4. Security Measures
-Password Hashing: Passwords are never stored in plain text. password_hash() is used for hashing and password_verify() for verification.
-
-5. Form Handling
-POST Requests: All sensitive data submissions (login, registration, updates) are handled via secure POST requests.
-Input Validation: Robust server-side validation is implemented to ensure data integrity and security.
+📊 Dashboard Features
+User statistics and analytics
+Quick actions panel
+Breadcrumb navigation
+Real-time form validation
+Auto-hiding alerts
 
 
 

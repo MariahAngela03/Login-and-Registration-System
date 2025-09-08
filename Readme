@@ -35,6 +35,91 @@ Framework: The system leverages a PHP framework such as Laravel for its robust s
 Front-End: The front-end styling is powered by Bootstrap 5 to provide a clean, responsive, and modern user interface.
 Database: A MySQL database is used for data persistence.
 
+File Structure & Functions
+Core Classes
+classes/database.php
+- Database Configuration Class
+- Establishes secure PDO connection to MySQL database
+- Configures PDO with proper error handling and security settings
+- Handles connection failures gracefully
+- Uses prepared statements to prevent SQL injection
+
+classes/Auth.php
+Authentication Management Class
+- User Registration: Validates input, checks for duplicates, hashes passwords
+- User Login: Authenticates credentials, manages sessions
+- Session Management: Handles session timeouts, security parameters
+
+classes/UserCRUD.php
+User Data Operations Class
+- Create: Add new user profiles with extended information
+- Read: Fetch user data with profile information, search functionality
+- Update: Modify user accounts and profiles
+- Delete: Remove users with safety checks
+- Bulk Operations: Handle multiple user actions simultaneously
+- Permission Checks: Ensure users can only delete appropriate accounts
+
+Frontend Pages
+index.php - Login Page
+- User authentication interface
+- Password visibility toggle
+- Form validation
+- Redirect logic for authenticated users
+- Error/success message handling
+
+register.php - Registration Page
+- New user account creation
+- Password confirmation matching
+- Real-time validation feedback
+- Terms of service acceptance
+- Comprehensive form validation
+
+dashboard.php - Main Dashboard
+- User management interface for admins
+- Search and filter functionality
+- Bulk user operations
+- User statistics display
+- Role-based feature access
+- Responsive data tables
+
+profile.php - User Profile Management
+- Personal profile editing
+- Account information display
+- Profile completeness indicators
+- Activity tracking
+- Security status information
+
+create_user.php - Admin User Creation
+- Admin-only user creation interface
+- Profile information setup
+- Success/error feedback
+
+edit_user.php - User Editing Interface
+- User information modification
+- Profile data updates
+
+view_user.php - User Details Display
+- Comprehensive user information view
+- Contact information display
+- Account activity tracking
+
+delete_user.php - User Deletion Interface
+- Secure user deletion process
+- Confirmation requirements
+- Admin protection
+
+Database Structure
+database.sql - Database Schema
+Tables:
+users: Core user authentication data (username, email, password, role)
+user_profiles: Extended profile information (phone, address, bio, profile image)
+user_sessions: Session management tracking
+
+Utility Files
+generate_hash.php
+- Password hash generation utility
+- Used for creating admin passwords
+- Demonstrates proper password hashing
 
 Installation Guide
 Step 1: Clone the Repository

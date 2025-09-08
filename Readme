@@ -2,14 +2,11 @@ Secure Login and Registration System
 Overview
 This is a full-stack web application built to demonstrate a secure and efficient user authentication and data management system. It features a complete user lifecycle, from registration and login to a personalized dashboard where users can perform full CRUD (Create, Read, Update, Delete) operations on their data. The system is built with a focus on modern security practices and is designed to be easily set up in a local development environment.
 
-
 Features
 🔐 Authentication & Security
 Secure user registration and login
 Password hashing with PHP's password_hash()
 Session management with timeout protection
-CSRF token protection
-XSS prevention through output sanitization
 Role-based access control (Admin/User)
 
 👥 User Management
@@ -29,9 +26,7 @@ Professional dashboard layout
 📊 Dashboard Features
 User statistics and analytics
 Quick actions panel
-Breadcrumb navigation
 Real-time form validation
-Auto-hiding alerts
 
 
 Technologies Used

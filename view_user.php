@@ -123,7 +123,12 @@ if (!$user_data) {
                         </div>
                         <div class="col">
                             <small class="text-muted d-block">Last Updated</small>
-                            <strong><?php echo $user_data['updated_at'] ? date('M Y', strtotime($user_data['updated_at'])) : 'Never'; ?></strong>
+                            <strong><?php 
+                                // Fix for undefined 'updated_at' key
+                                echo isset($user_data['updated_at']) && $user_data['updated_at'] 
+                                    ? date('M Y', strtotime($user_data['updated_at'])) 
+                                    : 'Never'; 
+                            ?></strong>
                         </div>
                     </div>
                 </div>
@@ -189,7 +194,7 @@ if (!$user_data) {
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Phone Number</small>
-                                    <strong><?php echo $user_data['phone'] ? Auth::sanitizeOutput($user_data['phone']) : 'Not provided'; ?></strong>
+                                    <strong><?php echo isset($user_data['phone']) && $user_data['phone'] ? Auth::sanitizeOutput($user_data['phone']) : 'Not provided'; ?></strong>
                                 </div>
                             </div>
                         </div>
@@ -202,7 +207,7 @@ if (!$user_data) {
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Address</small>
-                                    <strong><?php echo $user_data['address'] ? Auth::sanitizeOutput($user_data['address']) : 'Not provided'; ?></strong>
+                                    <strong><?php echo isset($user_data['address']) && $user_data['address'] ? Auth::sanitizeOutput($user_data['address']) : 'Not provided'; ?></strong>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +216,7 @@ if (!$user_data) {
             </div>
 
             <!-- Biography -->
-            <?php if ($user_data['bio']): ?>
+            <?php if (isset($user_data['bio']) && $user_data['bio']): ?>
                 <div class="card info-card mb-4">
                     <div class="card-header bg-info text-white">
                         <h5 class="mb-0">
@@ -248,7 +253,12 @@ if (!$user_data) {
                                 <div class="card-body text-center">
                                     <i class="fas fa-edit fa-2x mb-2"></i>
                                     <h6>Last Updated</h6>
-                                    <small><?php echo $user_data['updated_at'] ? date('M j, Y', strtotime($user_data['updated_at'])) : 'Never updated'; ?></small>
+                                    <small><?php 
+                                        // Fix for undefined 'updated_at' key
+                                        echo isset($user_data['updated_at']) && $user_data['updated_at'] 
+                                            ? date('M j, Y', strtotime($user_data['updated_at'])) 
+                                            : 'Never updated'; 
+                                    ?></small>
                                 </div>
                             </div>
                         </div>
@@ -283,10 +293,10 @@ if (!$user_data) {
                                         <small><strong>Profile Complete:</strong> 
                                             <?php 
                                             $completeness = 0;
-                                            if ($user_data['email']) $completeness += 25;
-                                            if ($user_data['full_name']) $completeness += 25;
-                                            if ($user_data['phone']) $completeness += 25;
-                                            if ($user_data['bio'] || $user_data['address']) $completeness += 25;
+                                            if (isset($user_data['email']) && $user_data['email']) $completeness += 25;
+                                            if (isset($user_data['full_name']) && $user_data['full_name']) $completeness += 25;
+                                            if (isset($user_data['phone']) && $user_data['phone']) $completeness += 25;
+                                            if ((isset($user_data['bio']) && $user_data['bio']) || (isset($user_data['address']) && $user_data['address'])) $completeness += 25;
                                             echo $completeness . '%';
                                             ?>
                                         </small>

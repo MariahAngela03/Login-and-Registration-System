@@ -100,19 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </a>
                         </div>
                         
-                        <hr class="my-3">
-                        <div class="text-center">
-                            <small class="text-muted">
-                                <strong>Demo Credentials:</strong><br>
-                                Admin: admin / admin123<br>
-                                User: testuser / user123
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

@@ -7,9 +7,8 @@
 class Database {
     private $host = 'localhost';
     private $db_name = 'user_management';
-    private $username = 'root'; // Change as needed
-    private $password = '';     // Change as needed
-    private $conn;
+    private $username = 'root';
+    private $password = '';  // Leave empty for XAMPP default
 
     /**
      * Get database connection using PDO

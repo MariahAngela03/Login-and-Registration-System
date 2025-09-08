@@ -36,11 +36,3 @@ CREATE TABLE user_sessions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
--- Insert sample admin user (password: admin123)
-INSERT INTO users (username, email, password, full_name, role) VALUES 
-('admin', 'admin@example.com', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj8xpDpJUBBS', 'Administrator', 'admin');
-
--- Insert sample regular user (password: user123)
-INSERT INTO users (username, email, password, full_name, role) VALUES 
-('testuser', 'user@example.com', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Test User', 'user');

@@ -181,33 +181,107 @@ class UserCRUD {
     }
     
     /**
-     * Delete user and their profile
+     * Delete user and associated profile data
      * @param int $user_id
      * @return array
      */
     public function deleteUser($user_id) {
         try {
-            // Don't allow deletion of admin users
-            $stmt = $this->conn->prepare("SELECT role FROM users WHERE id = ?");
-            $stmt->execute([$user_id]);
-            $user = $stmt->fetch();
+            // Start transaction
+            $this->conn->beginTransaction();
             
-            if ($user && $user['role'] === 'admin') {
-                return ['success' => false, 'message' => 'Cannot delete admin users.'];
+            // Get user info before deletion for logging
+            $stmt = $this->conn->prepare("SELECT username, email, full_name, role FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user_info = $stmt->fetch();
+            
+            if (!$user_info) {
+                $this->conn->rollback();
+                return ['success' => false, 'message' => 'User not found.'];
             }
             
-            // Delete user (profile will be deleted automatically due to foreign key constraint)
-            $stmt = $this->conn->prepare("DELETE FROM users WHERE id = ?");
+            // Don't allow deletion of admin users
+            if ($user_info['role'] === 'admin') {
+                // Check if this is the last admin
+                $stmt = $this->conn->prepare("SELECT COUNT(*) as admin_count FROM users WHERE role = 'admin'");
+                $stmt->execute();
+                $admin_count = $stmt->fetch()['admin_count'];
+                
+                if ($admin_count <= 1) {
+                    $this->conn->rollback();
+                    return ['success' => false, 'message' => 'Cannot delete the last admin user.'];
+                }
+            }
             
-            if ($stmt->execute([$user_id])) {
-                return ['success' => true, 'message' => 'User deleted successfully!'];
+            // Delete user profile first (if exists)
+            $stmt = $this->conn->prepare("DELETE FROM user_profiles WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+            
+            // Delete user record
+            $stmt = $this->conn->prepare("DELETE FROM users WHERE id = ?");
+            $result = $stmt->execute([$user_id]);
+            
+            if ($result && $stmt->rowCount() > 0) {
+                $this->conn->commit();
+                
+                // Log the deletion (optional)
+                error_log("User deleted: ID={$user_id}, Username={$user_info['username']}, Email={$user_info['email']}");
+                
+                return [
+                    'success' => true, 
+                    'message' => "User '{$user_info['full_name']}' has been successfully deleted.",
+                    'deleted_user' => $user_info
+                ];
             } else {
-                return ['success' => false, 'message' => 'Failed to delete user.'];
+                $this->conn->rollback();
+                return ['success' => false, 'message' => 'Failed to delete user. User may not exist.'];
             }
             
         } catch (PDOException $e) {
+            $this->conn->rollback();
             error_log("Delete user error: " . $e->getMessage());
-            return ['success' => false, 'message' => 'An error occurred while deleting user.'];
+            return ['success' => false, 'message' => 'An error occurred while deleting the user.'];
+        }
+    }
+    
+    /**
+     * Check if user can be deleted (prevent deleting admin users, etc.)
+     * @param int $user_id
+     * @param int $current_user_id
+     * @return array
+     */
+    public function canDeleteUser($user_id, $current_user_id) {
+        try {
+            // Prevent self-deletion
+            if ($user_id == $current_user_id) {
+                return ['can_delete' => false, 'message' => 'You cannot delete your own account.'];
+            }
+            
+            // Get user info
+            $stmt = $this->conn->prepare("SELECT role, username FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch();
+            
+            if (!$user) {
+                return ['can_delete' => false, 'message' => 'User not found.'];
+            }
+            
+            // Check if trying to delete the last admin (optional protection)
+            if ($user['role'] === 'admin') {
+                $stmt = $this->conn->prepare("SELECT COUNT(*) as admin_count FROM users WHERE role = 'admin'");
+                $stmt->execute();
+                $admin_count = $stmt->fetch()['admin_count'];
+                
+                if ($admin_count <= 1) {
+                    return ['can_delete' => false, 'message' => 'Cannot delete the last admin user.'];
+                }
+            }
+            
+            return ['can_delete' => true, 'message' => 'User can be deleted.'];
+            
+        } catch (PDOException $e) {
+            error_log("Can delete user check error: " . $e->getMessage());
+            return ['can_delete' => false, 'message' => 'Error checking user deletion permissions.'];
         }
     }
     

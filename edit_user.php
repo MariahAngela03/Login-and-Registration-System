@@ -280,7 +280,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <div class="bg-info text-white rounded p-3">
                                     <i class="fas fa-edit fa-2x mb-2"></i>
                                     <h6>Last Updated</h6>
-                                    <small><?php echo $user_data['updated_at'] ? date('M j, Y', strtotime($user_data['updated_at'])) : 'Never'; ?></small>
+                                    <small><?php 
+                                        // Fix for undefined 'updated_at' key
+                                        echo isset($user_data['updated_at']) && $user_data['updated_at'] 
+                                            ? date('M j, Y', strtotime($user_data['updated_at'])) 
+                                            : 'Never'; 
+                                    ?></small>
                                 </div>
                             </div>
                             <div class="col-md-3">

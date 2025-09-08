@@ -281,6 +281,30 @@ if ($search_term) {
         </div>
     </div>
 
+    <!-- Add this delete button in your user listing or user detail pages -->
+<?php if ($current_user['role'] === 'admin'): ?>
+    <a href="delete_user.php?id=<?php echo $user['id']; ?>" 
+       class="btn btn-outline-danger btn-sm"
+       onclick="return confirm('Are you sure you want to delete this user?')">
+        <i class="fas fa-trash-alt me-1"></i>Delete
+    </a>
+<?php endif; ?>
+<!-- Add this JavaScript to your dashboard for bulk delete -->
+<script>
+function bulkDeleteUsers() {
+    const checkboxes = document.querySelectorAll('input[name="selected_users[]"]:checked');
+    
+    if (checkboxes.length === 0) {
+        alert('Please select at least one user to delete.');
+        return;
+    }
+    
+    const userCount = checkboxes.length;
+    if (confirm(`Are you sure you want to delete ${userCount} user(s)? This action cannot be undone!`)) {
+        document.getElementById('bulkActionForm').submit();
+    }
+}
+</script>
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">

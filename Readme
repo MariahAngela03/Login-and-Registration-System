@@ -34,7 +34,6 @@ Real-time form validation
 Auto-hiding alerts
 
 
-
 Technologies Used
 PHP: The backend logic is built using PHP 8.
 Framework: The system leverages a PHP framework such as Laravel for its robust structure and built-in security features.
@@ -42,7 +41,34 @@ Front-End: The front-end styling is powered by Bootstrap 5 to provide a clean, r
 Database: A MySQL database is used for data persistence.
 
 
-Setup Instructions
-Prerequisites
-XAMPP: Ensure you have XAMPP installed and running. This provides the Apache web server and MySQL database.
+Installation Guide
+Step 1: Clone the Repository
+git clone [repository-url]
+cd [project-folder-name]
 
+Step 2: Start XAMPP Services
+Open XAMPP Control Panel
+Start Apache server
+Start MySQL server
+
+Step 3: Move Project to htdocs
+Copy the entire project folder to your XAMPP's htdocs directory
+Windows: C:\xampp\htdocs\
+macOS: /Applications/XAMPP/htdocs/
+Linux: /opt/lampp/htdocs/
+
+Step 4: Database Setup
+Open your web browser and navigate to http://localhost/phpmyadmin
+Import the database.sql file to create database (user_management)
+
+Step 4. Access the system.
+Navigate to: http://localhost/[your-project-folder-name]/
+The system should now be accessible
+
+For admin account:
+Username = admin
+Password = admin123
+
+Troubleshooting
+Ensure both Apache and MySQL services are running in XAMPP
+Check that the database was imported successfully

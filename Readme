@@ -145,6 +145,11 @@ Step 4. Access the system.
 Navigate to: http://localhost/[your-project-folder-name]/
 The system should now be accessible
 
+
+To add admin in database:
+USE user_management;
+INSERT INTO users (username, email, password, full_name, role) VALUES ('admin', 'admin@example.com', '$2y$12$HcU8kiqDQ5wRid7oEDAUb.TaAc.dZGkIGu.AwphZHrIiVsJJuL3Vm', 'Admin User', 'admin');
+
 For admin account:
 Username = admin
 Password = admin123
